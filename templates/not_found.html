@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}未找到扫描{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>未找到扫描 #{{ scan_id }}</h1>
+  <p>请返回首页重新选择扫描记录。</p>
+  <a class="link-btn" href="{{ url_for('index') }}">返回首页</a>
+</section>
+{% endblock %}

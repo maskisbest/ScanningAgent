@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}扫描 #{{ summary.scan.id }} - 网络漏洞扫描系统{% endblock %}
+{% block content %}
+<section class="panel" data-scan-id="{{ summary.scan.id }}" data-status="{{ summary.scan.status }}">
+  <div class="section-title">
+    <div>
+      <h1>扫描 #{{ summary.scan.id }}</h1>
+      <p>{{ summary.scan.target_input }} · {{ summary.scan.ports }} · {{ summary.scan.threads }} 线程</p>
+    </div>
+    <div class="actions">
+      <a class="link-btn" href="{{ url_for('report', scan_id=summary.scan.id, fmt='html') }}">导出 HTML</a>
+      <a class="link-btn" href="{{ url_for('report', scan_id=summary.scan.id, fmt='txt') }}">导出 Text</a>
+      <a class="link-btn" href="{{ url_for('report', scan_id=summary.scan.id, fmt='docx') }}">导出 Word</a>
+    </div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><span>状态</span><strong id="scan-status">{{ summary.scan.status }}</strong></div>
+    <div class="metric"><span>扫描时长</span><strong>{{ summary.scan.duration_seconds or 0 }}s</strong></div>
+    <div class="metric"><span>目标数量</span><strong>{{ summary.scan.target_count }}</strong></div>
+    <div class="metric"><span>开放端口</span><strong>{{ summary.service_count }}</strong></div>
+    <div class="metric"><span>风险总数</span><strong>{{ summary.finding_count }}</strong></div>
+  </div>
+  {% if summary.scan.error %}
+  <div class="alert">{{ summary.scan.error }}</div>
+  {% endif %}
+</section>
+
+<section class="dashboard-grid">
+  <div class="panel">
+    <h2>风险等级</h2>
+    <div class="bar-chart" data-chart='{{ summary.by_severity | tojson }}'></div>
+  </div>
+  <div class="panel">
+    <h2>漏洞类型</h2>
+    <div class="bar-chart" data-chart='{{ summary.by_category | tojson }}'></div>
+  </div>
+  <div class="panel">
+    <h2>目标风险分布</h2>
+    <div class="bar-chart" data-chart='{{ summary.by_host | tojson }}'></div>
+  </div>
+  <div class="panel">
+    <h2>扫描指标</h2>
+    <div class="bar-chart" data-chart='{{ {"扫描时长": summary.scan.duration_seconds or 0, "目标数量": summary.scan.target_count or 0, "漏洞数量": summary.finding_count or 0} | tojson }}'></div>
+  </div>
+</section>
+
+<section class="panel">
+  <div class="section-title">
+    <div>
+      <h2>智能分析</h2>
+      <p>默认使用本地规则，配置 API Key 后自动调用智能模型。</p>
+    </div>
+    <button class="secondary" id="assistant-btn" data-scan-id="{{ summary.scan.id }}">生成分析</button>
+  </div>
+  <pre class="analysis" id="assistant-output">等待生成。</pre>
+</section>
+
+<section class="panel">
+  <h2>开放服务</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>主机</th><th>端口</th><th>协议</th><th>服务</th><th>Banner</th></tr></thead>
+      <tbody>
+        {% for item in summary.services %}
+        <tr>
+          <td>{{ item.host }}</td>
+          <td>{{ item.port }}</td>
+          <td>{{ item.protocol }}</td>
+          <td>{{ item.service }}</td>
+          <td>{{ item.banner }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="empty">未发现开放服务</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>漏洞与风险明细</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>等级</th>
+          <th>目标</th>
+          <th>名称</th>
+          <th>类型</th>
+          <th>证据</th>
+          <th>修复建议</th>
+          <th>来源说明</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in summary.findings %}
+        <tr>
+          <td><span class="severity severity-{{ item.severity }}">{{ item.severity }}</span></td>
+          <td>{{ item.host }}:{{ item.port or '-' }}</td>
+          <td>{{ item.title }}<br><small>{{ item.rule_id }}</small></td>
+          <td>{{ item.category }}</td>
+          <td>{{ item.evidence }}</td>
+          <td>{{ item.recommendation }}</td>
+          <td>{{ item.source }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="empty">未发现风险项</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  window.renderCharts();
+  window.bindAssistant();
+  window.pollScanIfRunning();
+</script>
+{% endblock %}

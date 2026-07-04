@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}新建扫描 - 网络漏洞扫描系统{% endblock %}
+{% block content %}
+<section class="panel">
+  <div class="section-title">
+    <div>
+      <h1>新建漏洞扫描</h1>
+      <p>支持主机、IP 范围、CIDR，内置 {{ rule_count }} 条安全检查规则。</p>
+    </div>
+  </div>
+  <form class="scan-form" method="post" action="{{ url_for('create_scan') }}">
+    <label>
+      <span>目标主机或 IP 范围</span>
+      <textarea name="targets" rows="4" placeholder="示例：127.0.0.1 或 192.168.1.1-192.168.1.20 或 192.168.1.0/24" required></textarea>
+    </label>
+    <label>
+      <span>端口</span>
+      <textarea name="ports" rows="3">{{ default_ports }}</textarea>
+    </label>
+    <label class="compact">
+      <span>并发线程数量</span>
+      <input type="number" name="threads" value="32" min="1" max="128">
+    </label>
+    <div class="form-actions">
+      <button class="primary" type="submit">开始扫描</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="section-title">
+    <div>
+      <h2>历史扫描</h2>
+      <p>最近 20 条扫描记录。</p>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>目标</th>
+          <th>状态</th>
+          <th>目标数</th>
+          <th>开放端口</th>
+          <th>风险数</th>
+          <th>耗时</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for scan in scans %}
+        <tr>
+          <td>#{{ scan.id }}</td>
+          <td>{{ scan.target_input }}</td>
+          <td><span class="badge status-{{ scan.status }}">{{ scan.status }}</span></td>
+          <td>{{ scan.target_count }}</td>
+          <td>{{ scan.open_port_count }}</td>
+          <td>{{ scan.finding_count }}</td>
+          <td>{{ scan.duration_seconds or 0 }}s</td>
+          <td><a class="link-btn" href="{{ url_for('scan_detail', scan_id=scan.id) }}">查看</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="empty">暂无扫描记录</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
