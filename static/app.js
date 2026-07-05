@@ -88,6 +88,77 @@
     });
   };
 
+  window.bindFindingsFilter = function () {
+    var toolbar = document.querySelector(".filter-toolbar");
+    if (!toolbar) {
+      return;
+    }
+    var table = document.getElementById(toolbar.getAttribute("data-target"));
+    if (!table) {
+      return;
+    }
+    var rows = Array.prototype.slice.call(
+      table.querySelectorAll("tbody tr[data-severity]")
+    );
+    var emptyRow = table.querySelector(".filter-empty-row");
+    var chips = Array.prototype.slice.call(toolbar.querySelectorAll(".filter-chip"));
+    var search = toolbar.querySelector(".filter-search");
+    var countEl = toolbar.querySelector(".filter-count");
+    var activeSeverity = "all";
+
+    function apply() {
+      var keyword = (search.value || "").trim().toLowerCase();
+      var visible = 0;
+      rows.forEach(function (row) {
+        var matchesSeverity =
+          activeSeverity === "all" || row.getAttribute("data-severity") === activeSeverity;
+        var matchesKeyword = !keyword || row.textContent.toLowerCase().indexOf(keyword) !== -1;
+        var show = matchesSeverity && matchesKeyword;
+        row.hidden = !show;
+        if (show) {
+          visible += 1;
+        }
+      });
+      if (emptyRow) {
+        emptyRow.hidden = visible !== 0;
+      }
+      if (countEl) {
+        countEl.textContent = "显示 " + visible + " / " + rows.length + " 条";
+      }
+    }
+
+    chips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        chips.forEach(function (c) {
+          c.classList.remove("active");
+        });
+        chip.classList.add("active");
+        activeSeverity = chip.getAttribute("data-severity");
+        apply();
+      });
+    });
+
+    if (search) {
+      search.addEventListener("input", apply);
+    }
+
+    apply();
+  };
+
+  window.bindScanForm = function () {
+    var form = document.querySelector(".scan-form");
+    if (!form) {
+      return;
+    }
+    form.addEventListener("submit", function () {
+      var btn = form.querySelector("button[type=submit]");
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "扫描发起中…";
+      }
+    });
+  };
+
   window.pollScanIfRunning = function () {
     var panel = document.querySelector("[data-scan-id]");
     if (!panel) {

@@ -63,20 +63,24 @@ def index() -> str:
     )
 
 
+def render_error(message: str) -> Response:
+    return Response(render_template("error.html", message=message, author=AUTHOR_INFO), status=400)
+
+
 @app.post("/scan")
 def create_scan() -> Response:
     target_input = request.form.get("targets", "").strip()
     ports = request.form.get("ports", "").strip()
     threads = int(request.form.get("threads", "32") or 32)
     if not target_input:
-        return Response("扫描目标不能为空", status=400)
+        return render_error("扫描目标不能为空")
     try:
         targets = parse_targets(target_input)
         parsed_ports = parse_ports(ports)
     except Exception as exc:
-        return Response(f"输入参数错误：{exc}", status=400)
+        return render_error(f"输入参数错误：{exc}")
     if not parsed_ports:
-        return Response("端口列表不能为空", status=400)
+        return render_error("端口列表不能为空")
     ports_text = ",".join(str(port) for port in parsed_ports)
     scan_id = database.create_scan(target_input, ports_text, threads, utc_now())
     database.update_scan(scan_id, target_count=len(targets))

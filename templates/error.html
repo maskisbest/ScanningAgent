@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}输入有误 - 网络漏洞扫描系统{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>提交的扫描参数有误</h1>
+  <div class="alert">{{ message }}</div>
+  <p style="margin-top: 14px;">请检查目标格式（单个 IP / 域名 / CIDR 网段 / IP 范围 / 逗号混合）或端口设置后重试。</p>
+  <div class="actions" style="margin-top: 18px; justify-content: flex-start;">
+    <a class="link-btn primary" href="{{ url_for('index') }}">返回首页重新提交</a>
+  </div>
+</section>
+{% endblock %}

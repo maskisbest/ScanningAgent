@@ -154,8 +154,21 @@
       <p>按风险等级排序展示证据、修复建议和规则来源。</p>
     </div>
   </div>
+  {% if summary.findings %}
+  <div class="filter-toolbar" data-target="findings-table">
+    <div class="filter-severity">
+      <button type="button" class="filter-chip active" data-severity="all">全部</button>
+      <button type="button" class="filter-chip" data-severity="高危">高危</button>
+      <button type="button" class="filter-chip" data-severity="中危">中危</button>
+      <button type="button" class="filter-chip" data-severity="低危">低危</button>
+      <button type="button" class="filter-chip" data-severity="信息">信息</button>
+    </div>
+    <input type="text" class="filter-search" placeholder="搜索目标 / 名称 / 规则编号 / 证据…">
+    <span class="filter-count"></span>
+  </div>
+  {% endif %}
   <div class="table-wrap">
-    <table class="data-table findings-table">
+    <table class="data-table findings-table" id="findings-table">
       <thead>
         <tr>
           <th>等级</th>
@@ -170,7 +183,7 @@
       </thead>
       <tbody>
         {% for item in summary.findings %}
-        <tr>
+        <tr data-severity="{{ item.severity }}">
           <td><span class="severity severity-{{ item.severity }}">{{ item.severity }}</span></td>
           <td><strong>{{ item.host }}:{{ item.port or '-' }}</strong></td>
           <td><strong>{{ item.title }}</strong><br><small>{{ item.rule_id }}</small></td>
@@ -191,6 +204,7 @@
         {% else %}
         <tr><td colspan="8" class="empty">未发现风险项</td></tr>
         {% endfor %}
+        <tr class="filter-empty-row" hidden><td colspan="8" class="empty">没有匹配筛选条件的风险项</td></tr>
       </tbody>
     </table>
   </div>
@@ -201,5 +215,6 @@
   window.renderCharts();
   window.bindAssistant();
   window.pollScanIfRunning();
+  window.bindFindingsFilter();
 </script>
 {% endblock %}

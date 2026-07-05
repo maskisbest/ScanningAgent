@@ -994,6 +994,10 @@ small {
   width: 20%;
 }
 
+.findings-table th:nth-child(8) {
+  width: 200px;
+}
+
 .evidence-cell,
 .recommendation-cell {
   max-width: 360px;
@@ -1039,6 +1043,65 @@ small {
   border-radius: 6px;
   background: rgba(5, 12, 22, 0.44);
   color: #c9d7e8;
+}
+
+.filter-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 0 22px 18px;
+}
+
+.filter-severity {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filter-chip {
+  min-height: 32px;
+  padding: 5px 13px;
+  border: 1px solid rgba(116, 184, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(5, 12, 22, 0.5);
+  color: var(--muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.16s ease, color 0.16s ease, background 0.16s ease;
+}
+
+.filter-chip:hover {
+  border-color: rgba(57, 213, 255, 0.5);
+  color: var(--text);
+}
+
+.filter-chip.active {
+  border-color: rgba(57, 213, 255, 0.68);
+  background: rgba(57, 213, 255, 0.14);
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.filter-search {
+  flex: 1 1 220px;
+  min-width: 180px;
+  max-width: 320px;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: 1px solid rgba(116, 184, 255, 0.22);
+  border-radius: 999px;
+  background: rgba(3, 9, 17, 0.58);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+}
+
+.filter-count {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .recommendation-cell {
