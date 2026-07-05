@@ -8,7 +8,13 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="{{ url_for('index') }}">网络漏洞扫描系统</a>
+    <a class="brand" href="{{ url_for('index') }}">
+      <span class="brand-mark">NS</span>
+      <span>
+        <strong>网络漏洞扫描系统</strong>
+        <small>Network Security Scanner</small>
+      </span>
+    </a>
     <nav>
       <span>{{ author.course if author else '课程设计' }}</span>
     </nav>

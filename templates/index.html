@@ -1,35 +1,102 @@
 {% extends "base.html" %}
 {% block title %}新建扫描 - 网络漏洞扫描系统{% endblock %}
 {% block content %}
-<section class="panel">
-  <div class="section-title">
-    <div>
-      <h1>新建漏洞扫描</h1>
-      <p>支持主机、IP 范围、CIDR，内置 {{ rule_count }} 条安全检查规则。</p>
-    </div>
+<section class="page-hero">
+  <div>
+    <span class="eyebrow">Security Dashboard</span>
+    <h1>网络资产漏洞扫描控制台</h1>
+    <p>集中配置扫描目标、端口范围和并发线程，生成可视化结果与课程设计报告。</p>
   </div>
-  <form class="scan-form" method="post" action="{{ url_for('create_scan') }}">
-    <label>
-      <span>目标主机或 IP 范围</span>
-      <textarea name="targets" rows="4" placeholder="示例：127.0.0.1 或 192.168.1.1-192.168.1.20 或 192.168.1.0/24" required></textarea>
-    </label>
-    <label>
-      <span>端口</span>
-      <textarea name="ports" rows="3">{{ default_ports }}</textarea>
-    </label>
-    <label class="compact">
-      <span>并发线程数量</span>
-      <input type="number" name="threads" value="32" min="1" max="128">
-    </label>
-    <div class="form-actions">
-      <button class="primary" type="submit">开始扫描</button>
-    </div>
-  </form>
+  <div class="hero-status">
+    <span>当前规则库</span>
+    <strong>{{ rule_count }}</strong>
+    <small>条安全检查规则</small>
+  </div>
 </section>
 
-<section class="panel">
+<section class="feature-grid">
+  <div class="feature-card">
+    <span class="feature-icon">01</span>
+    <div>
+      <strong>{{ rule_count }} 条规则</strong>
+      <p>覆盖端口暴露、HTTP 安全头、敏感路径和 TLS 证书检查。</p>
+    </div>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">02</span>
+    <div>
+      <strong>报告导出</strong>
+      <p>扫描完成后可导出 HTML、Text 和 Word 报告，便于课程提交。</p>
+    </div>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">03</span>
+    <div>
+      <strong>并发扫描</strong>
+      <p>支持自定义线程数量，在演示环境中兼顾速度与稳定性。</p>
+    </div>
+  </div>
+  <div class="feature-card">
+    <span class="feature-icon">04</span>
+    <div>
+      <strong>智能分析</strong>
+      <p>默认使用本地规则摘要，也可配置 API Key 生成整改建议。</p>
+    </div>
+  </div>
+</section>
+
+<section class="scan-workspace">
+  <div class="panel scan-builder">
+    <div class="section-title">
+      <div>
+        <span class="eyebrow">New Scan</span>
+        <h2>新建漏洞扫描</h2>
+        <p>支持单个主机、IP 范围、CIDR 和逗号分隔的混合输入。</p>
+      </div>
+    </div>
+    <form class="scan-form" method="post" action="{{ url_for('create_scan') }}">
+      <label>
+        <span>目标主机或 IP 范围</span>
+        <textarea name="targets" rows="5" placeholder="示例：127.0.0.1 或 192.168.1.1-192.168.1.20 或 192.168.1.0/24" required></textarea>
+      </label>
+      <label>
+        <span>端口</span>
+        <textarea name="ports" rows="4">{{ default_ports }}</textarea>
+      </label>
+      <div class="form-row">
+        <label class="compact">
+          <span>并发线程数量</span>
+          <input type="number" name="threads" value="32" min="1" max="128">
+        </label>
+        <div class="form-actions">
+          <button class="primary" type="submit">开始扫描</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <aside class="guidance-stack">
+    <div class="note-panel">
+      <span class="eyebrow">Input Examples</span>
+      <h2>输入示例</h2>
+      <ul class="clean-list">
+        <li><code>127.0.0.1</code><span>扫描本机</span></li>
+        <li><code>192.168.1.1-192.168.1.20</code><span>扫描连续 IP 段</span></li>
+        <li><code>192.168.1.0/24</code><span>扫描 CIDR 网段</span></li>
+      </ul>
+    </div>
+    <div class="note-panel safety-note">
+      <span class="eyebrow">Safety Notice</span>
+      <h2>安全提示</h2>
+      <p>仅扫描自己拥有或明确获得授权的资产。系统只执行非破坏性的端口探测、响应头检查和公开路径检查。</p>
+    </div>
+  </aside>
+</section>
+
+<section class="panel history-panel">
   <div class="section-title">
     <div>
+      <span class="eyebrow">History</span>
       <h2>历史扫描</h2>
       <p>最近 20 条扫描记录。</p>
     </div>
