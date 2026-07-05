@@ -49,15 +49,20 @@ def ai_analysis(summary: Dict[str, Any]) -> str:
             "title": item["title"],
             "category": item["category"],
             "evidence": item.get("evidence", "")[:200],
+            "owasp": item.get("owasp_category"),
+            "dengbao": item.get("dengbao_category"),
+            "cve": [c["id"] for c in item.get("cve_refs") or []],
         }
         for item in findings
     ]
     prompt = (
         "你是网络安全课程设计系统的防御型整改助手。"
-        "请基于扫描结果生成中文摘要、风险优先级和整改步骤。"
+        "请基于扫描结果生成中文摘要、风险优先级和整改步骤，"
+        "并在合适的地方引用样本中提供的 OWASP Top 10 / 等保 2.0 分类和 CVE 编号帮助定级。"
         "不要提供漏洞利用步骤、绕过认证或攻击代码。\n\n"
         f"扫描摘要：{summary.get('scan')}\n"
         f"统计：{summary.get('by_severity')}, {summary.get('by_category')}\n"
+        f"合规覆盖：OWASP={summary.get('by_owasp')}, 等保2.0={summary.get('by_dengbao')}\n"
         f"漏洞样本：{compact}"
     )
     try:
@@ -69,7 +74,7 @@ def ai_analysis(summary: Dict[str, Any]) -> str:
                 "input": prompt,
                 "max_output_tokens": 900,
             },
-            timeout=30,
+            timeout=90,
         )
         resp.raise_for_status()
         data = resp.json()

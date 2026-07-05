@@ -22,6 +22,8 @@ from urllib.parse import urljoin
 
 import requests
 
+import cve_intel
+
 
 DEFAULT_PORTS = [
     21,
@@ -294,6 +296,8 @@ def parse_ports(raw: str) -> List[int]:
 
 def finding(host: str, port: Optional[int], service: str, rule_id: str, evidence: str) -> Dict[str, Any]:
     rule = RULES[rule_id]
+    owasp, dengbao = cve_intel.compliance_for_category(rule.category)
+    cve_refs = cve_intel.cves_for_finding(rule_id, evidence)
     return {
         "host": host,
         "port": port,
@@ -305,6 +309,11 @@ def finding(host: str, port: Optional[int], service: str, rule_id: str, evidence
         "evidence": evidence[:800],
         "recommendation": rule.recommendation,
         "source": rule.source,
+        "owasp_category": owasp,
+        "dengbao_category": dengbao,
+        "cve_refs": [
+            {"id": ref.cve_id, "severity": ref.severity, "summary": ref.summary} for ref in cve_refs
+        ],
     }
 
 

@@ -637,13 +637,18 @@ small {
 }
 
 .badge,
-.severity {
+.severity,
+.tag {
   display: inline-flex;
   align-items: center;
-  min-height: 25px;
-  padding: 4px 9px;
   border: 1px solid transparent;
   border-radius: 999px;
+}
+
+.badge,
+.severity {
+  min-height: 25px;
+  padding: 4px 9px;
   font-size: 13px;
   font-weight: 760;
 }
@@ -980,15 +985,52 @@ small {
   text-align: center;
 }
 
-.findings-table th:nth-child(5),
-.findings-table th:nth-child(6) {
-  width: 22%;
+.findings-table th:nth-child(5) {
+  width: 160px;
+}
+
+.findings-table th:nth-child(6),
+.findings-table th:nth-child(7) {
+  width: 20%;
 }
 
 .evidence-cell,
 .recommendation-cell {
   max-width: 360px;
   line-height: 1.6;
+}
+
+.compliance-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tag {
+  padding: 2px 8px;
+  font-size: 11px;
+  line-height: 1.6;
+  white-space: nowrap;
+  border-color: var(--line);
+}
+
+.tag-owasp {
+  border-color: rgba(111, 168, 255, 0.42);
+  background: rgba(111, 168, 255, 0.12);
+  color: var(--low);
+}
+
+.tag-dengbao {
+  border-color: rgba(61, 242, 163, 0.34);
+  background: rgba(61, 242, 163, 0.12);
+  color: var(--success);
+}
+
+.tag-cve {
+  border-color: rgba(255, 85, 115, 0.34);
+  background: rgba(255, 85, 115, 0.12);
+  color: var(--danger);
+  cursor: help;
 }
 
 .evidence-cell {

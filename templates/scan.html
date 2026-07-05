@@ -10,6 +10,7 @@
       <span>{{ summary.scan.status }}</span>
       <span>{{ summary.service_count }} 个开放服务</span>
       <span>{{ summary.finding_count }} 个风险项</span>
+      <span>{{ summary.cve_count }} 个关联 CVE 参考</span>
     </div>
   </div>
   <div class="actions">
@@ -87,6 +88,20 @@
     </div>
     <div class="bar-chart" data-chart='{{ {"扫描时长": summary.scan.duration_seconds or 0, "目标数量": summary.scan.target_count or 0, "漏洞数量": summary.finding_count or 0} | tojson }}'></div>
   </div>
+  <div class="panel chart-panel">
+    <div>
+      <span class="eyebrow">OWASP Top 10:2021</span>
+      <h2>OWASP 分类覆盖</h2>
+    </div>
+    <div class="bar-chart" data-chart='{{ summary.by_owasp | tojson }}'></div>
+  </div>
+  <div class="panel chart-panel">
+    <div>
+      <span class="eyebrow">GB/T 22239-2019</span>
+      <h2>等保 2.0 技术类别覆盖</h2>
+    </div>
+    <div class="bar-chart" data-chart='{{ summary.by_dengbao | tojson }}'></div>
+  </div>
 </section>
 
 <section class="analysis-panel">
@@ -147,6 +162,7 @@
           <th>目标</th>
           <th>名称</th>
           <th>类型</th>
+          <th>合规映射 / CVE</th>
           <th>证据</th>
           <th>修复建议</th>
           <th>来源说明</th>
@@ -159,12 +175,21 @@
           <td><strong>{{ item.host }}:{{ item.port or '-' }}</strong></td>
           <td><strong>{{ item.title }}</strong><br><small>{{ item.rule_id }}</small></td>
           <td>{{ item.category }}</td>
+          <td>
+            <div class="compliance-cell">
+              {% if item.owasp_category %}<span class="tag tag-owasp">{{ item.owasp_category }}</span>{% endif %}
+              {% if item.dengbao_category %}<span class="tag tag-dengbao">{{ item.dengbao_category }}</span>{% endif %}
+              {% for cve in item.cve_refs %}
+              <span class="tag tag-cve" title="{{ cve.summary }}">{{ cve.id }}</span>
+              {% endfor %}
+            </div>
+          </td>
           <td><div class="evidence-cell">{{ item.evidence }}</div></td>
           <td><div class="recommendation-cell">{{ item.recommendation }}</div></td>
           <td><small>{{ item.source }}</small></td>
         </tr>
         {% else %}
-        <tr><td colspan="7" class="empty">未发现风险项</td></tr>
+        <tr><td colspan="8" class="empty">未发现风险项</td></tr>
         {% endfor %}
       </tbody>
     </table>

@@ -63,11 +63,18 @@ def init_db() -> None:
                 evidence TEXT,
                 recommendation TEXT,
                 source TEXT,
+                owasp_category TEXT,
+                dengbao_category TEXT,
+                cve_refs TEXT,
                 created_at TEXT NOT NULL,
                 FOREIGN KEY(scan_id) REFERENCES scans(id)
             )
             """
         )
+        existing_columns = {row["name"] for row in conn.execute("PRAGMA table_info(findings)")}
+        for column in ("owasp_category", "dengbao_category", "cve_refs"):
+            if column not in existing_columns:
+                conn.execute(f"ALTER TABLE findings ADD COLUMN {column} TEXT")
         conn.execute(
             """
             CREATE TABLE IF NOT EXISTS services (
@@ -151,6 +158,9 @@ def insert_findings(scan_id: int, findings: List[Dict[str, Any]], created_at: st
             item.get("evidence", ""),
             item.get("recommendation", ""),
             item.get("source", ""),
+            item.get("owasp_category", ""),
+            item.get("dengbao_category", ""),
+            json.dumps(item.get("cve_refs", []), ensure_ascii=False),
             created_at,
         )
         for item in findings
@@ -160,8 +170,9 @@ def insert_findings(scan_id: int, findings: List[Dict[str, Any]], created_at: st
             """
             INSERT INTO findings
             (scan_id, host, port, service, rule_id, title, severity, category,
-             evidence, recommendation, source, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             evidence, recommendation, source, owasp_category, dengbao_category,
+             cve_refs, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             rows,
         )
@@ -215,7 +226,15 @@ def get_findings(scan_id: int) -> List[Dict[str, Any]]:
             """,
             (scan_id,),
         ).fetchall()
-        return [dict(row) for row in rows]
+    result = []
+    for row in rows:
+        item = dict(row)
+        try:
+            item["cve_refs"] = json.loads(item.get("cve_refs") or "[]")
+        except json.JSONDecodeError:
+            item["cve_refs"] = []
+        result.append(item)
+    return result
 
 
 def scan_summary(scan_id: int) -> Dict[str, Any]:
@@ -227,10 +246,18 @@ def scan_summary(scan_id: int) -> Dict[str, Any]:
     by_severity: Dict[str, int] = {"高危": 0, "中危": 0, "低危": 0, "信息": 0}
     by_category: Dict[str, int] = {}
     by_host: Dict[str, int] = {}
+    by_owasp: Dict[str, int] = {}
+    by_dengbao: Dict[str, int] = {}
+    cve_count = 0
     for finding in findings:
         by_severity[finding["severity"]] = by_severity.get(finding["severity"], 0) + 1
         by_category[finding["category"]] = by_category.get(finding["category"], 0) + 1
         by_host[finding["host"]] = by_host.get(finding["host"], 0) + 1
+        if finding.get("owasp_category"):
+            by_owasp[finding["owasp_category"]] = by_owasp.get(finding["owasp_category"], 0) + 1
+        if finding.get("dengbao_category"):
+            by_dengbao[finding["dengbao_category"]] = by_dengbao.get(finding["dengbao_category"], 0) + 1
+        cve_count += len(finding.get("cve_refs") or [])
     return {
         "scan": scan,
         "services": services,
@@ -238,6 +265,9 @@ def scan_summary(scan_id: int) -> Dict[str, Any]:
         "by_severity": by_severity,
         "by_category": by_category,
         "by_host": by_host,
+        "by_owasp": by_owasp,
+        "by_dengbao": by_dengbao,
+        "cve_count": cve_count,
         "service_count": len(services),
         "finding_count": len(findings),
     }

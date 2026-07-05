@@ -20,6 +20,11 @@
 - 支持导出 HTML、Text、Word 报告。
 - 提供可选“智能分析”接口：未配置 API 时使用本地规则摘要；配置兼容 OpenAI Responses API 的 Key 后可生成更自然的整改建议。
 
+## 创新点
+
+- **离线 CVE 关联匹配**（`cve_intel.py`）：对 banner 中解析出的组件版本（OpenSSH/Apache/nginx/IIS）按版本区间关联已知公开 CVE 编号；对 SMB/RDP/Redis/Elasticsearch 等服务类暴露关联该类服务历史上著名的公开漏洞（如 EternalBlue、BlueKeep），均以“若未修补需关注”的方式呈现，不做在线查询也不做利用尝试。
+- **合规映射**（OWASP Top 10:2021 + GB/T 22239-2019 等保 2.0 技术类别）：复用现有 60 条规则的 `category` 分类，为每个风险项自动打上对应的 OWASP 分类和等保技术控制类别标签，报告和仪表盘中新增合规覆盖度统计，方便从"发现了什么漏洞"延伸到"对应哪类安全治理要求"。
+
 ## 安装运行
 
 ```bash
