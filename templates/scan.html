@@ -2,10 +2,15 @@
 {% block title %}扫描 #{{ summary.scan.id }} - 网络漏洞扫描系统{% endblock %}
 {% block content %}
 <section class="page-hero scan-hero" data-scan-id="{{ summary.scan.id }}" data-status="{{ summary.scan.status }}">
-  <div>
+  <div class="hero-copy">
     <span class="eyebrow">Scan Result</span>
     <h1>扫描 #{{ summary.scan.id }} 风险仪表盘</h1>
     <p>{{ summary.scan.target_input }} · {{ summary.scan.ports }} · {{ summary.scan.threads }} 线程</p>
+    <div class="hero-chips">
+      <span>{{ summary.scan.status }}</span>
+      <span>{{ summary.service_count }} 个开放服务</span>
+      <span>{{ summary.finding_count }} 个风险项</span>
+    </div>
   </div>
   <div class="actions">
     <a class="link-btn" href="{{ url_for('report', scan_id=summary.scan.id, fmt='html') }}">导出 HTML</a>
@@ -40,6 +45,13 @@
     <strong>{{ summary.finding_count }}</strong>
     <small>漏洞与配置风险项</small>
   </div>
+</section>
+
+<section class="risk-strip">
+  <div><span>高危</span><strong>{{ summary.by_severity.get('高危', 0) }}</strong></div>
+  <div><span>中危</span><strong>{{ summary.by_severity.get('中危', 0) }}</strong></div>
+  <div><span>低危</span><strong>{{ summary.by_severity.get('低危', 0) }}</strong></div>
+  <div><span>信息</span><strong>{{ summary.by_severity.get('信息', 0) }}</strong></div>
 </section>
 
 {% if summary.scan.error %}

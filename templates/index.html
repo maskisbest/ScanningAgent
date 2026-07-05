@@ -2,15 +2,22 @@
 {% block title %}新建扫描 - 网络漏洞扫描系统{% endblock %}
 {% block content %}
 <section class="page-hero">
-  <div>
+  <div class="hero-copy">
     <span class="eyebrow">Security Dashboard</span>
     <h1>网络资产漏洞扫描控制台</h1>
     <p>集中配置扫描目标、端口范围和并发线程，生成可视化结果与课程设计报告。</p>
+    <div class="hero-chips">
+      <span>TCP 探测</span>
+      <span>HTTP 安全头</span>
+      <span>TLS 证书</span>
+      <span>敏感路径</span>
+    </div>
   </div>
   <div class="hero-status">
     <span>当前规则库</span>
     <strong>{{ rule_count }}</strong>
     <small>条安全检查规则</small>
+    <div class="status-line"><i></i></div>
   </div>
 </section>
 
@@ -53,6 +60,7 @@
         <h2>新建漏洞扫描</h2>
         <p>支持单个主机、IP 范围、CIDR 和逗号分隔的混合输入。</p>
       </div>
+      <span class="module-badge">SCAN NODE</span>
     </div>
     <form class="scan-form" method="post" action="{{ url_for('create_scan') }}">
       <label>
@@ -85,10 +93,20 @@
         <li><code>192.168.1.0/24</code><span>扫描 CIDR 网段</span></li>
       </ul>
     </div>
+    <div class="note-panel requirement-note">
+      <span class="eyebrow">Course Mapping</span>
+      <h2>课程要求对照</h2>
+      <ul class="clean-list">
+        <li><code>基本功能</code><span>目标范围、并发线程、扫描结果展示。</span></li>
+        <li><code>规则数量</code><span>内置 {{ rule_count }} 条安全检查规则，超过 50 项。</span></li>
+        <li><code>加分项</code><span>风险分级、统计图表、HTML/Text/Word 报告。</span></li>
+      </ul>
+    </div>
     <div class="note-panel safety-note">
       <span class="eyebrow">Safety Notice</span>
       <h2>安全提示</h2>
       <p>仅扫描自己拥有或明确获得授权的资产。系统只执行非破坏性的端口探测、响应头检查和公开路径检查。</p>
+      <div class="safe-meter"><span></span></div>
     </div>
   </aside>
 </section>
